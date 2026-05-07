@@ -162,7 +162,7 @@ jobs:
         with:
           repository: ${{ inputs.repository }}
           ref: ${{ inputs.tag != '' && inputs.tag || inputs.branch }}
-          token: ${{ secrets.HOPPSCOTCH_GITHUB_CHECKOUT_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Set Perl environment variables
         shell: pwsh
         run: |
