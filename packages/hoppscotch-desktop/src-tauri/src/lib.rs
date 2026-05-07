@@ -2,6 +2,7 @@ pub mod backup;
 pub mod config;
 pub mod dialog;
 pub mod error;
+pub mod grpc;
 pub mod logger;
 pub mod path;
 pub mod server;
@@ -262,6 +263,7 @@ pub fn run() {
             path::get_backup_dir,
             path::get_logs_dir,
             logger::append_log,
+            grpc::grpc_unary_invoke,
             path::read_log,
             path::get_appload_registry,
         ])

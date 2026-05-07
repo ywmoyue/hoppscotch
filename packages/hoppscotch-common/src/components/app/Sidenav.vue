@@ -7,10 +7,10 @@
         v-tippy="{
           theme: 'tooltip',
           placement: mdAndLarger ? 'right' : 'bottom',
-          content: !EXPAND_NAVIGATION ? t(navigation.title) : null,
+          content: !EXPAND_NAVIGATION ? getNavigationTitle(navigation) : null,
         }"
         :to="navigation.target"
-        :aria-label="!EXPAND_NAVIGATION ? t(navigation.title) : null"
+        :aria-label="!EXPAND_NAVIGATION ? getNavigationTitle(navigation) : null"
         class="nav-link"
         tabindex="0"
         :exact="navigation.exact"
@@ -19,7 +19,7 @@
           <component :is="navigation.svg" class="svg-icons" />
         </div>
         <span v-if="EXPAND_NAVIGATION" class="nav-title">
-          {{ t(navigation.title) }}
+          {{ getNavigationTitle(navigation) }}
         </span>
       </HoppSmartLink>
     </nav>
@@ -28,9 +28,12 @@
 
 <script setup lang="ts">
 import { breakpointsTailwind, useBreakpoints } from "@vueuse/core"
+import { computed } from "vue"
+import { getKernelMode } from "@hoppscotch/kernel"
 import IconLink2 from "~icons/lucide/link-2"
 import IconGraphql from "~icons/hopp/graphql"
 import IconGlobe from "~icons/lucide/globe"
+import IconNetwork from "~icons/lucide/network"
 import IconSettings from "~icons/lucide/settings"
 import { useSetting } from "@composables/settings"
 import { useI18n } from "@composables/i18n"
@@ -39,10 +42,11 @@ const t = useI18n()
 
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const mdAndLarger = breakpoints.greater("md")
+const isDesktop = getKernelMode() === "desktop"
 
 const EXPAND_NAVIGATION = useSetting("EXPAND_NAVIGATION")
 
-const primaryNavigation = [
+const primaryNavigation = computed(() => [
   {
     target: "/",
     svg: IconLink2,
@@ -55,6 +59,17 @@ const primaryNavigation = [
     title: "navigation.graphql",
     exact: false,
   },
+  ...(isDesktop
+    ? [
+        {
+          target: "/grpc",
+          svg: IconNetwork,
+          title: "gRPC API Testing",
+          localized: false,
+          exact: false,
+        },
+      ]
+    : []),
   {
     target: "/realtime",
     svg: IconGlobe,
@@ -67,7 +82,12 @@ const primaryNavigation = [
     title: "navigation.settings",
     exact: false,
   },
-]
+])
+
+type NavigationItem = (typeof primaryNavigation.value)[number]
+
+const getNavigationTitle = (navigation: NavigationItem) =>
+  navigation.localized === false ? navigation.title : t(navigation.title)
 </script>
 
 <style lang="scss" scoped>
